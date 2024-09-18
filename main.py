@@ -1,3 +1,4 @@
+
 import click
 import requests
 import json
@@ -8,10 +9,29 @@ def tranf_celsius(kelvin):
     return kelvin - 273.15
 
 # Función principal que obtiene y muestra la información climática
-@click.command()
+@click.command(help="""
+    Aplicación CLI para consultar el pronóstico del clima usando la API de OpenWeather.
+
+    Requisitos:
+    - Proporcionar el nombre de la ciudad para obtener el pronóstico actual.
+    - Seleccionar el formato de salida usando la opción '--output': 'json' o 'text'.
+
+    Ejemplos de Uso:
+    1. Para obtener la información del clima en texto:
+       python challenge1.py Asuncion --output text
+       
+    2. Para obtener la información en formato JSON:
+       python challenge1.py Asuncion --output json
+       
+    3. Para guardar la información en un archivo CSV:
+       python challenge1.py Asuncion --output csv
+
+    NOTA: La aplicación maneja errores de conexión y ciudad no encontrada.
+    """)
 @click.argument('ciudad')
 @click.option('--output', type=click.Choice(['json','text'], case_sensitive=False), default='text', help='Formato de salida: json o txt')
 def mostrar_clima(ciudad, output):
+    """Consulta y muestra el pronóstico del clima para la CIUDAD especificada."""
     BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
     
     url = BASE_URL + "appid=" + API_KEY + '&q=' + ciudad + '&lang=es'
