@@ -14,7 +14,7 @@ def tranf_celsius(kelvin):
 def mostrar_clima(ciudad, output):
     BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
     
-    url = f"{BASE_URL}appid={API_KEY}&q={ciudad}&lang=es"
+    url = BASE_URL + "appid=" + API_KEY + '&q=' + ciudad + '&lang=es'
     
     try:
         response = requests.get(url)
