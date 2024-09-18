@@ -1,33 +1,15 @@
-
 import click
 import requests
 import json
 from apikey import API_KEY
+
 
 # Función para convertir Kelvin a Celsius
 def tranf_celsius(kelvin):
     return kelvin - 273.15
 
 # Función principal que obtiene y muestra la información climática
-@click.command(help="""
-    Aplicación CLI para consultar el pronóstico del clima usando la API de OpenWeather.
-
-    Requisitos:
-    - Proporcionar el nombre de la ciudad para obtener el pronóstico actual.
-    - Seleccionar el formato de salida usando la opción '--output': 'json' o 'text'.
-
-    Ejemplos de Uso:
-    1. Para obtener la información del clima en texto:
-       python challenge1.py Asuncion --output text
-       
-    2. Para obtener la información en formato JSON:
-       python challenge1.py Asuncion --output json
-       
-    3. Para guardar la información en un archivo CSV:
-       python challenge1.py Asuncion --output csv
-
-    NOTA: La aplicación maneja errores de conexión y ciudad no encontrada.
-    """)
+@click.command(help="Aplicación CLI para consultar el pronóstico del clima usando la API de OpenWeather.")
 @click.argument('ciudad')
 @click.option('--output', type=click.Choice(['json','text'], case_sensitive=False), default='text', help='Formato de salida: json o txt')
 def mostrar_clima(ciudad, output):
@@ -39,7 +21,13 @@ def mostrar_clima(ciudad, output):
     try:
         response = requests.get(url)
         response.raise_for_status()  # Verifica si hay errores en la solicitud
+
         data = response.json()
+
+        # Verificar si la ciudad fue encontrada
+        if data.get('cod') == '404':
+            click.echo(f"Error: No se encontró la ciudad '{ciudad}'. Por favor, verifica el nombre e intenta nuevamente.")
+            return
 
         # Extraer datos
         temp_kelvin = data['main']['temp']
@@ -71,12 +59,10 @@ def mostrar_clima(ciudad, output):
             click.echo(f"Humedad: {humedad}%")
             click.echo(f"Visibilidad: {visibilidad} m")
 
-    except requests.exceptions.HTTPError as http_err:
-        click.echo(f"Error en la solicitud: {http_err}")
+    except requests.exceptions.HTTPError:
+        click.echo(f"Error: No se encontró la ciudad '{ciudad}'. Por favor, verifica el nombre e intenta nuevamente.")
     except requests.exceptions.RequestException as err:
         click.echo(f"Error de conexión: {err}")
-    except KeyError:
-        click.echo(f"No se pudo obtener la información para la ciudad: {ciudad}")
 
 if __name__ == '__main__':
     mostrar_clima()
